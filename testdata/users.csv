@@ -1,0 +1,6 @@
+username,email,password,firstName,lastName,gender,status
+john_doe,john.doe@test.com,Password123,John,Doe,male,active
+jane_smith,jane.smith@test.com,SecurePass456,Jane,Smith,female,active
+bob_wilson,bob.wilson@test.com,TestPass789,Bob,Wilson,male,inactive
+alice_brown,alice.brown@test.com,MyPass321,Alice,Brown,female,active
+charlie_davis,charlie.davis@test.com,Pass@word654,Charlie,Davis,male,active
