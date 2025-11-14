@@ -67,15 +67,8 @@ pipeline {
             // Publish JUnit Results
             junit testResults: 'test-results/junit.xml', allowEmptyResults: true
             
-            // Archive artifacts
-            archiveArtifacts artifacts: 'playwright-report/**/*', allowEmptyArchive: true
-            archiveArtifacts artifacts: 'test-results/**/*.json', allowEmptyArchive: true
-            archiveArtifacts artifacts: 'test-results/**/*.xml', allowEmptyArchive: true
-            
-            // Archive traces, videos, screenshots (if they exist)
-            archiveArtifacts artifacts: 'test-results/**/trace.zip', allowEmptyArchive: true
-            archiveArtifacts artifacts: 'test-results/**/*.webm', allowEmptyArchive: true
-            archiveArtifacts artifacts: 'test-results/**/*.png', allowEmptyArchive: true
+            // Archive all test artifacts (reports, traces, videos, screenshots)
+            archiveArtifacts artifacts: 'playwright-report/**/*,test-results/**/*', allowEmptyArchive: true, onlyIfSuccessful: false
         }
         
         success {
