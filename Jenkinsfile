@@ -28,7 +28,7 @@ pipeline {
                 echo 'Running Playwright tests...'
                 script {
                     try {
-                        bat 'npx playwright test --grep "@SmokeTest"'
+                        bat 'npx playwright test --grep "@SmokeTest" --project=chromium'
                     } catch (Exception e) {
                         echo "Tests failed, but continuing to publish results..."
                         currentBuild.result = 'UNSTABLE'
