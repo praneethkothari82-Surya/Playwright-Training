@@ -20,7 +20,7 @@ constructor(page) {
 }
 
 async register(firstName, lastName, email, password, gender) {
-    let emailExists;
+    
     
     if (gender === 'male') {
         await this.genderMaleRadio.check();
@@ -35,11 +35,19 @@ async register(firstName, lastName, email, password, gender) {
     await this.confirmPasswordInput.fill(password);
     await this.registerButton.click();
     await this.page.waitForLoadState('networkidle');
-    if (emailExists = await this.page.locator(`The specified email already exists`).isVisible()){
-
-        console.log('User already exists. Please use a different email to register.');
-        return;
+    
+    // Check if email already exists error
+    const emailExists = this.page.locator("div[class='validation-summary-errors'] ul li");
+    const emailExistsCount = await emailExists.count();
+    
+    if (emailExistsCount > 0) {
+        const errorText = await emailExists.textContent();
+        if (errorText.includes('The specified email already exists')) {
+            console.log('User already exists. Please use a different email to register.');
+            return;
+        }
     }
+    
     console.log(await this.registerConfirmationMessage.first().textContent());
     const registerText = await this.registerConfirmationMessage.first().textContent();
     expect(registerText.trim()).toContain('Your registration completed');
