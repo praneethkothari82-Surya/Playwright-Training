@@ -87,35 +87,37 @@ pipeline {
     post {
         always {
             script {
-                echo 'Publishing test results...'
-                
-                // Publish Simple HTML Report (CSP-friendly)
-                publishHTML([
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: 'test-results',
-                    reportFiles: 'simple-report.html',
-                    reportName: 'Playwright Simple Report',
-                    reportTitles: ''
-                ])
-                
-                // Publish Full HTML Report (may need CSP config)
-                publishHTML([
-                    allowMissing: true,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: 'playwright-report',
-                    reportFiles: 'index.html',
-                    reportName: 'Playwright Full Report',
-                    reportTitles: ''
-                ])
-                
-                // Publish JUnit Results
-                junit testResults: 'test-results/junit.xml', allowEmptyResults: true
-                
-                // Archive all test artifacts (reports, traces, videos, screenshots)
-                archiveArtifacts artifacts: 'playwright-report/**/*,test-results/**/*', allowEmptyArchive: true, onlyIfSuccessful: false
+                node {
+                    echo 'Publishing test results...'
+                    
+                    // Publish JUnit Results
+                    junit testResults: 'test-results/junit.xml', allowEmptyResults: true
+                    
+                    // Archive all test artifacts (reports, traces, videos, screenshots)
+                    archiveArtifacts artifacts: 'playwright-report/**/*,test-results/**/*', allowEmptyArchive: true, onlyIfSuccessful: false
+                    
+                    // Publish Simple HTML Report (CSP-friendly)
+                    publishHTML([
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'test-results',
+                        reportFiles: 'simple-report.html',
+                        reportName: 'Playwright Simple Report',
+                        reportTitles: ''
+                    ])
+                    
+                    // Publish Full HTML Report (may need CSP config)
+                    publishHTML([
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'playwright-report',
+                        reportFiles: 'index.html',
+                        reportName: 'Playwright Full Report',
+                        reportTitles: ''
+                    ])
+                }
             }
         }
         
