@@ -3,6 +3,8 @@ const path = require('path');
 
 /**
  * ExcelReader - Utility for reading data from Excel files (.xlsx, .xls)
+ * Uses SheetJS (xlsx) for fast reading and parsing
+ * ExcelJS can be used separately for writing/generating Excel files
  * Provides dynamic data access from Excel sheets
  * 
  * @example

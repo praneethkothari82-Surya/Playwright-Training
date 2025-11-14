@@ -1,11 +1,34 @@
 pipeline {
     agent any
     
+    environment {
+        // Dynamically set workers based on available CPU cores
+        // Use 75% of available cores for optimal performance
+        PLAYWRIGHT_WORKERS = "${(Runtime.getRuntime().availableProcessors() * 0.75).toInteger()}"
+    }
+    
     stages {
         stage('Checkout') {
             steps {
                 echo 'Checking out code...'
                 checkout scm
+            }
+        }
+        
+        stage('System Info') {
+            steps {
+                script {
+                    def cpuCores = Runtime.getRuntime().availableProcessors()
+                    def maxMemory = Runtime.getRuntime().maxMemory() / (1024 * 1024 * 1024)
+                    
+                    echo "========================================"
+                    echo "Jenkins Agent System Information"
+                    echo "========================================"
+                    echo "CPU Cores Available: ${cpuCores}"
+                    echo "Max Memory (GB): ${maxMemory.round(2)}"
+                    echo "Playwright Workers: ${PLAYWRIGHT_WORKERS}"
+                    echo "========================================"
+                }
             }
         }
         
@@ -28,7 +51,8 @@ pipeline {
                 echo 'Running Playwright tests...'
                 script {
                     try {
-                        bat 'npx playwright test --grep "@SmokeTest" --project=chromium'
+                        // Use PLAYWRIGHT_WORKERS environment variable
+                        bat "npx playwright test --grep \"@SmokeTest\" --project=chromium --workers=${env.PLAYWRIGHT_WORKERS}"
                     } catch (Exception e) {
                         echo "Tests failed, but continuing to publish results..."
                         currentBuild.result = 'UNSTABLE'

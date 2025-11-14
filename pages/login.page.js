@@ -25,6 +25,7 @@ constructor(page) {
  * @tag smoketest
  */
 async login(email, password) {
+    console.log('User Login Initiated. Navigating and Login to Application.');
     await this.navigateToLoginPage();
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);
