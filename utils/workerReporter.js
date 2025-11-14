@@ -10,24 +10,22 @@ class WorkerReporter {
   }
 
   onTestBegin(test) {
-    const workerId = test.parallelIndex;
-    const workerIndex = process.env.TEST_WORKER_INDEX || '?';
-    console.log(`\n[Worker ${workerIndex}][Test ${workerId + 1}] 🚀 STARTING: ${test.title}`);
+    const workerId = typeof test.parallelIndex === 'number' ? test.parallelIndex : '?';
+    console.log(`\n[Worker ${workerId}] 🚀 STARTING: ${test.title}`);
   }
 
   onStdOut(chunk, test) {
-    // Pass through stdout with worker context preserved
-    process.stdout.write(chunk);
+    // Don't duplicate output - let the default reporter handle it
+    // process.stdout.write(chunk);
   }
 
   onStdErr(chunk, test) {
-    // Pass through stderr with worker context preserved
-    process.stderr.write(chunk);
+    // Don't duplicate output - let the default reporter handle it
+    // process.stderr.write(chunk);
   }
 
   onTestEnd(test, result) {
-    const workerId = test.parallelIndex;
-    const workerIndex = process.env.TEST_WORKER_INDEX || '?';
+    const workerId = typeof test.parallelIndex === 'number' ? test.parallelIndex : '?';
     const duration = (result.duration / 1000).toFixed(2);
     
     const statusIcon = {
@@ -46,10 +44,10 @@ class WorkerReporter {
 
     const reset = '\x1b[0m';
 
-    console.log(`[Worker ${workerIndex}][Test ${workerId + 1}] ${statusIcon} ${statusColor}${result.status.toUpperCase()}${reset}: ${test.title} (${duration}s)`);
+    console.log(`[Worker ${workerId}] ${statusIcon} ${statusColor}${result.status.toUpperCase()}${reset}: ${test.title} (${duration}s)`);
     
     if (result.status === 'failed' && result.error) {
-      console.log(`[Worker ${workerIndex}] 💥 Error: ${result.error.message}`);
+      console.log(`[Worker ${workerId}] 💥 Error: ${result.error.message}`);
     }
   }
 
