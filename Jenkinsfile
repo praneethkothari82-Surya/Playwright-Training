@@ -2,9 +2,8 @@ pipeline {
     agent any
     
     environment {
-        // Dynamically set workers based on available CPU cores
-        // Use 75% of available cores for optimal performance
-        PLAYWRIGHT_WORKERS = "${(Runtime.getRuntime().availableProcessors() * 0.75).toInteger()}"
+        // Default workers for CI (will be overridden in System Info stage)
+        PLAYWRIGHT_WORKERS = '3'
     }
     
     stages {
@@ -18,16 +17,39 @@ pipeline {
         stage('System Info') {
             steps {
                 script {
-                    def cpuCores = Runtime.getRuntime().availableProcessors()
-                    def maxMemory = Runtime.getRuntime().maxMemory() / (1024 * 1024 * 1024)
+                    // Get system information
+                    def isWindows = isUnix() ? false : true
                     
-                    echo "========================================"
-                    echo "Jenkins Agent System Information"
-                    echo "========================================"
-                    echo "CPU Cores Available: ${cpuCores}"
-                    echo "Max Memory (GB): ${maxMemory.round(2)}"
-                    echo "Playwright Workers: ${PLAYWRIGHT_WORKERS}"
-                    echo "========================================"
+                    if (isWindows) {
+                        // Windows: Use PowerShell to get CPU count
+                        def cpuCount = bat(returnStdout: true, script: '@echo off && powershell -Command "[System.Environment]::ProcessorCount"').trim()
+                        def cpuCores = cpuCount.toInteger()
+                        def workers = Math.floor(cpuCores * 0.75).toInteger()
+                        
+                        // Set environment variable for this build
+                        env.PLAYWRIGHT_WORKERS = workers.toString()
+                        
+                        echo "========================================"
+                        echo "Jenkins Agent System Information"
+                        echo "========================================"
+                        echo "CPU Cores Available: ${cpuCores}"
+                        echo "Playwright Workers: ${env.PLAYWRIGHT_WORKERS}"
+                        echo "========================================"
+                    } else {
+                        // Linux/Mac: Use nproc or sysctl
+                        def cpuCount = sh(returnStdout: true, script: 'nproc || sysctl -n hw.ncpu').trim()
+                        def cpuCores = cpuCount.toInteger()
+                        def workers = Math.floor(cpuCores * 0.75).toInteger()
+                        
+                        env.PLAYWRIGHT_WORKERS = workers.toString()
+                        
+                        echo "========================================"
+                        echo "Jenkins Agent System Information"
+                        echo "========================================"
+                        echo "CPU Cores Available: ${cpuCores}"
+                        echo "Playwright Workers: ${env.PLAYWRIGHT_WORKERS}"
+                        echo "========================================"
+                    }
                 }
             }
         }
@@ -64,35 +86,37 @@ pipeline {
     
     post {
         always {
-            echo 'Publishing test results...'
-            
-            // Publish Simple HTML Report (CSP-friendly)
-            publishHTML([
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'test-results',
-                reportFiles: 'simple-report.html',
-                reportName: 'Playwright Simple Report',
-                reportTitles: ''
-            ])
-            
-            // Publish Full HTML Report (may need CSP config)
-            publishHTML([
-                allowMissing: true,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'playwright-report',
-                reportFiles: 'index.html',
-                reportName: 'Playwright Full Report',
-                reportTitles: ''
-            ])
-            
-            // Publish JUnit Results
-            junit testResults: 'test-results/junit.xml', allowEmptyResults: true
-            
-            // Archive all test artifacts (reports, traces, videos, screenshots)
-            archiveArtifacts artifacts: 'playwright-report/**/*,test-results/**/*', allowEmptyArchive: true, onlyIfSuccessful: false
+            script {
+                echo 'Publishing test results...'
+                
+                // Publish Simple HTML Report (CSP-friendly)
+                publishHTML([
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'test-results',
+                    reportFiles: 'simple-report.html',
+                    reportName: 'Playwright Simple Report',
+                    reportTitles: ''
+                ])
+                
+                // Publish Full HTML Report (may need CSP config)
+                publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'playwright-report',
+                    reportFiles: 'index.html',
+                    reportName: 'Playwright Full Report',
+                    reportTitles: ''
+                ])
+                
+                // Publish JUnit Results
+                junit testResults: 'test-results/junit.xml', allowEmptyResults: true
+                
+                // Archive all test artifacts (reports, traces, videos, screenshots)
+                archiveArtifacts artifacts: 'playwright-report/**/*,test-results/**/*', allowEmptyArchive: true, onlyIfSuccessful: false
+            }
         }
         
         success {
