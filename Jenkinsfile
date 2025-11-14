@@ -26,7 +26,14 @@ pipeline {
         stage('Run Tests') {
             steps {
                 echo 'Running Playwright tests...'
-                bat 'npx playwright test --grep "@SmokeTest"'
+                script {
+                    try {
+                        bat 'npx playwright test --grep "@SmokeTest"'
+                    } catch (Exception e) {
+                        echo "Tests failed, but continuing to publish results..."
+                        currentBuild.result = 'UNSTABLE'
+                    }
+                }
             }
         }
     }
@@ -34,6 +41,8 @@ pipeline {
     post {
         always {
             echo 'Publishing test results...'
+            
+            // Publish HTML Report
             publishHTML([
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
@@ -44,8 +53,17 @@ pipeline {
                 reportTitles: ''
             ])
             
+            // Publish JUnit Results
+            junit testResults: 'test-results/junit.xml', allowEmptyResults: true
+            
+            // Archive artifacts
             archiveArtifacts artifacts: 'playwright-report/**/*', allowEmptyArchive: true
             archiveArtifacts artifacts: 'test-results/**/*', allowEmptyArchive: true
+            
+            // Archive traces, videos, screenshots
+            archiveArtifacts artifacts: 'test-results/**/trace.zip', allowEmptyArchive: true
+            archiveArtifacts artifacts: 'test-results/**/*.webm', allowEmptyArchive: true
+            archiveArtifacts artifacts: 'test-results/**/*.png', allowEmptyArchive: true
         }
         
         success {
