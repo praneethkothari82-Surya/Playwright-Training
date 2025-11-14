@@ -46,15 +46,16 @@ function enhancedTest(name, options, testFn) {
 /**
  * Retry action with logging
  */
-async function retryAction(action, maxRetries = 3, actionName = 'Action') {
+async function retryAction(action, maxRetries = 3, actionName = 'Action', testInfo = null) {
+    const workerPrefix = testInfo ? `[W${testInfo.parallelIndex}] ` : '';
     for (let i = 0; i < maxRetries; i++) {
         try {
-            console.log(`  ↻ ${actionName} - Attempt ${i + 1}`);
+            console.log(`${workerPrefix}  ↻ ${actionName} - Attempt ${i + 1}`);
             await action();
-            console.log(`  ✓ ${actionName} - Success`);
+            console.log(`${workerPrefix}  ✓ ${actionName} - Success`);
             return;
         } catch (error) {
-            console.error(`  ✗ ${actionName} - Failed: ${error.message}`);
+            console.error(`${workerPrefix}  ✗ ${actionName} - Failed: ${error.message}`);
             if (i === maxRetries - 1) throw error;
             await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s before retry
         }
@@ -64,14 +65,15 @@ async function retryAction(action, maxRetries = 3, actionName = 'Action') {
 /**
  * Log test step
  */
-async function logStep(stepName, action) {
-    console.log(`  → ${stepName}`);
+async function logStep(stepName, action, testInfo = null) {
+    const workerPrefix = testInfo ? `[W${testInfo.parallelIndex}] ` : '';
+    console.log(`${workerPrefix}  → ${stepName}`);
     try {
         const result = await action();
-        console.log(`  ✓ ${stepName}`);
+        console.log(`${workerPrefix}  ✓ ${stepName}`);
         return result;
     } catch (error) {
-        console.error(`  ✗ ${stepName}: ${error.message}`);
+        console.error(`${workerPrefix}  ✗ ${stepName}: ${error.message}`);
         throw error;
     }
 }
