@@ -49,12 +49,12 @@ function enhancedTest(name, options, testFn) {
 async function retryAction(action, maxRetries = 3, actionName = 'Action') {
     for (let i = 0; i < maxRetries; i++) {
         try {
-            console.log(`${actionName} - Attempt ${i + 1}`);
+            console.log(`  ↻ ${actionName} - Attempt ${i + 1}`);
             await action();
-            console.log(`${actionName} - Success`);
+            console.log(`  ✓ ${actionName} - Success`);
             return;
         } catch (error) {
-            console.error(`${actionName} - Failed on attempt ${i + 1}: ${error.message}`);
+            console.error(`  ✗ ${actionName} - Failed: ${error.message}`);
             if (i === maxRetries - 1) throw error;
             await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s before retry
         }
@@ -65,13 +65,13 @@ async function retryAction(action, maxRetries = 3, actionName = 'Action') {
  * Log test step
  */
 async function logStep(stepName, action) {
-    console.log(`[STEP] ${stepName}`);
+    console.log(`  → ${stepName}`);
     try {
         const result = await action();
-        console.log(`[STEP PASSED] ${stepName}`);
+        console.log(`  ✓ ${stepName}`);
         return result;
     } catch (error) {
-        console.error(`[STEP FAILED] ${stepName}: ${error.message}`);
+        console.error(`  ✗ ${stepName}: ${error.message}`);
         throw error;
     }
 }
