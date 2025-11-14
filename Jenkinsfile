@@ -42,14 +42,25 @@ pipeline {
         always {
             echo 'Publishing test results...'
             
-            // Publish HTML Report
+            // Publish Simple HTML Report (CSP-friendly)
             publishHTML([
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
+                reportDir: 'test-results',
+                reportFiles: 'simple-report.html',
+                reportName: 'Playwright Simple Report',
+                reportTitles: ''
+            ])
+            
+            // Publish Full HTML Report (may need CSP config)
+            publishHTML([
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
                 reportDir: 'playwright-report',
                 reportFiles: 'index.html',
-                reportName: 'Playwright Test Report',
+                reportName: 'Playwright Full Report',
                 reportTitles: ''
             ])
             

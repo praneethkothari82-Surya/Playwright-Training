@@ -26,6 +26,7 @@ export default defineConfig({
     ['html', { open: 'never' }],
     ['json', { outputFile: 'test-results/results.json' }],
     ['junit', { outputFile: 'test-results/junit.xml' }],
+    ['./utils/simpleHTMLReporter.js', { outputFile: 'test-results/simple-report.html' }],
     ['list'],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
