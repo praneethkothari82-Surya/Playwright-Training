@@ -58,12 +58,27 @@ pipeline {
             
             // Archive artifacts
             archiveArtifacts artifacts: 'playwright-report/**/*', allowEmptyArchive: true
-            archiveArtifacts artifacts: 'test-results/**/*', allowEmptyArchive: true
+            archiveArtifacts artifacts: 'test-results/**/*.json', allowEmptyArchive: true
             
-            // Archive traces, videos, screenshots
-            archiveArtifacts artifacts: 'test-results/**/trace.zip', allowEmptyArchive: true
-            archiveArtifacts artifacts: 'test-results/**/*.webm', allowEmptyArchive: true
-            archiveArtifacts artifacts: 'test-results/**/*.png', allowEmptyArchive: true
+            // Archive traces, videos, screenshots only if they exist
+            script {
+                if (fileExists('test-results')) {
+                    def traceFiles = findFiles(glob: 'test-results/**/trace.zip')
+                    if (traceFiles.length > 0) {
+                        archiveArtifacts artifacts: 'test-results/**/trace.zip', allowEmptyArchive: true
+                    }
+                    
+                    def videoFiles = findFiles(glob: 'test-results/**/*.webm')
+                    if (videoFiles.length > 0) {
+                        archiveArtifacts artifacts: 'test-results/**/*.webm', allowEmptyArchive: true
+                    }
+                    
+                    def screenshotFiles = findFiles(glob: 'test-results/**/*.png')
+                    if (screenshotFiles.length > 0) {
+                        archiveArtifacts artifacts: 'test-results/**/*.png', allowEmptyArchive: true
+                    }
+                }
+            }
         }
         
         success {
