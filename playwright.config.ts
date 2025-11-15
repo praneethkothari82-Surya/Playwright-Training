@@ -26,19 +26,23 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 3 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: process.env.CI
-    ? [
-        ['blob'],  // Blob reporter for sharded CI runs
-        ['github'],  // GitHub Actions annotations and PR comments
-        ['list'],
-      ]
-    : [
-        ['html', { open: 'never' }],
-        ['json', { outputFile: 'test-results/results.json' }],
-        ['junit', { outputFile: 'test-results/junit.xml' }],
-        ['./utils/simpleHTMLReporter.js', { outputFile: 'test-results/simple-report.html' }],
-        ['list'],
-      ],
+  reporter: [
+    ['html', { open: 'never' }],
+    ['json', { outputFile: 'test-results/results.json' }],
+    ['junit', { outputFile: 'test-results/junit.xml' }],
+    ['allure-playwright', { 
+      outputFolder: 'allure-results',
+      detail: true,
+      suiteTitle: true,
+      environmentInfo: {
+        'Environment': process.env.CI ? 'Jenkins CI' : 'Local',
+        'Node Version': process.version,
+        'Base URL': 'https://demowebshop.tricentis.com/'
+      }
+    }],
+    ['./utils/simpleHTMLReporter.js', { outputFile: 'test-results/simple-report.html' }],
+    ['list'],
+  ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */

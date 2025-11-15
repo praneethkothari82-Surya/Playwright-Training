@@ -93,8 +93,17 @@ pipeline {
                     // Publish JUnit Results
                     junit testResults: 'test-results/junit.xml', allowEmptyResults: true
                     
+                    // Publish Allure Report
+                    allure([
+                        includeProperties: false,
+                        jdk: '',
+                        properties: [],
+                        reportBuildPolicy: 'ALWAYS',
+                        results: [[path: 'allure-results']]
+                    ])
+                    
                     // Archive all test artifacts (reports, traces, videos, screenshots)
-                    archiveArtifacts artifacts: 'playwright-report/**/*,test-results/**/*', allowEmptyArchive: true, onlyIfSuccessful: false
+                    archiveArtifacts artifacts: 'playwright-report/**/*,test-results/**/*,allure-results/**/*', allowEmptyArchive: true, onlyIfSuccessful: false
                     
                     // Publish Simple HTML Report (CSP-friendly)
                     publishHTML([
