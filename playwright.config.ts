@@ -14,7 +14,10 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './',  // Search from root
   testMatch: ['tests/**/*.spec.{js,ts}', 'Training/**/*.spec.{js,ts}'],  // Include both tests and Training folders
-  testIgnore: ['**/node_modules/**'],  // Ignore node_modules
+  testIgnore: [
+    '**/node_modules/**',
+    ...(process.env.CI ? ['Training/Parallel Execution/Examples/**'] : [])  // Ignore Training examples in CI
+  ],
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
