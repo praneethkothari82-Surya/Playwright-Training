@@ -7,14 +7,20 @@ pipeline {
         CI = 'true'
     }
     
+    options {
+        // Clean workspace before build to ensure fresh code
+        skipDefaultCheckout(true)
+    }
+    
     stages {
         stage('Checkout') {
             steps {
                 script {
                     try {
-                        echo 'Checking out code...'
+                        echo 'Cleaning workspace and checking out fresh code...'
+                        deleteDir()  // Clean everything
                         checkout scm
-                        echo '✓ Checkout successful'
+                        echo '✓ Fresh checkout successful'
                     } catch (Exception e) {
                         echo "✗ Checkout failed: ${e.message}"
                         throw e
