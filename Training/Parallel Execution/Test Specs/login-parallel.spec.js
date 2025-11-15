@@ -87,7 +87,7 @@ test.describe('Parallel Login Tests - Basic Scenarios', () => {
             
             // Verify successful login
             console.log(`${workerPrefix} → Verifying login success`);
-            await expect(page).toHaveURL(/.*automationexercise.com/, { timeout: 10000 });
+            await expect(page).toHaveURL(/.*demowebshop.tricentis.com/, { timeout: 10000 });
             
             // Additional verification: Check if logged in
             const isLoggedIn = await homePage.isUserLoggedIn();
@@ -121,7 +121,7 @@ test.describe('Parallel Login Tests - Basic Scenarios', () => {
                 await loginPage.login(user.email, user.password);
                 
                 // Verify login
-                await expect(page).toHaveURL(/.*automationexercise.com/);
+                await expect(page).toHaveURL(/.*demowebshop.tricentis.com/);
                 
                 console.log(`${workerPrefix} ✅ User ${i + 1} logged in successfully`);
             }
@@ -160,7 +160,7 @@ test.describe('Parallel Login Tests - Active Users Only', () => {
             await loginPage.login(user.email, user.password);
             
             // Verify successful login
-            await expect(page).toHaveURL(/.*automationexercise.com/);
+            await expect(page).toHaveURL(/.*demowebshop.tricentis.com/);
             const isLoggedIn = await homePage.isUserLoggedIn();
             expect(isLoggedIn).toBe(true);
             
@@ -198,7 +198,7 @@ test.describe('Parallel Login Tests - Error Handling', () => {
             await page.goto('/');
             await loginPage.login(user.email, user.password);
             
-            await expect(page).toHaveURL(/.*automationexercise.com/);
+            await expect(page).toHaveURL(/.*demowebshop.tricentis.com/);
             
             console.log(`${workerPrefix} ✅ Error handling test completed`);
         }
@@ -227,7 +227,7 @@ test.describe('Parallel Login Tests - Error Handling', () => {
             await loginPage.login(user.email, user.password);
             
             // Verify with retry
-            await expect(page).toHaveURL(/.*automationexercise.com/, { 
+            await expect(page).toHaveURL(/.*demowebshop.tricentis.com/, { 
                 timeout: 15000  // Increased timeout
             });
             
@@ -262,7 +262,7 @@ test.describe('Parallel Login Tests - Multiple Sessions', () => {
             console.log(`${workerPrefix} → Session 1: ${users[0].email}`);
             await page.goto('/');
             await loginPage.login(users[0].email, users[0].password);
-            await expect(page).toHaveURL(/.*automationexercise.com/);
+            await expect(page).toHaveURL(/.*demowebshop.tricentis.com/);
             
             // Logout
             await homePage.logout();
@@ -271,7 +271,7 @@ test.describe('Parallel Login Tests - Multiple Sessions', () => {
             // Login with second user
             console.log(`${workerPrefix} → Session 2: ${users[1].email}`);
             await loginPage.login(users[1].email, users[1].password);
-            await expect(page).toHaveURL(/.*automationexercise.com/);
+            await expect(page).toHaveURL(/.*demowebshop.tricentis.com/);
             
             console.log(`${workerPrefix} ✅ Multiple sessions test completed`);
         }

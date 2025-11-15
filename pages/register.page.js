@@ -43,8 +43,8 @@ async register(firstName, lastName, email, password, gender) {
     if (emailExistsCount > 0) {
         const errorText = await emailExists.textContent();
         if (errorText.includes('The specified email already exists')) {
-            console.log('User already exists. Please use a different email to register.');
-            return;
+            console.error('❌ DUPLICATE EMAIL ERROR: Email already exists in the system');
+            throw new Error('Duplicate email detected. Test data must be unique. Use UniqueDataGenerator or ensure test data has unique emails.');
         }
     }
     

@@ -36,6 +36,7 @@
 
 const { readCSV } = require('./csvReader');
 const { readExcel } = require('./excelReader');
+const { uniqueDataGenerator } = require('./uniqueDataGenerator');
 const path = require('path');
 
 class TestDataManager {
@@ -111,6 +112,7 @@ class TestDataManager {
     /**
      * Get unique data for a specific worker
      * Each worker gets its own subset of data to prevent conflicts
+     * AUTOMATICALLY ENHANCES EMAIL WITH UNIQUENESS GUARANTEE
      * 
      * WORKER DATA PARTITIONING:
      * ------------------------
@@ -152,7 +154,12 @@ class TestDataManager {
                 if (altIndex < this.allData.length && !this.usedIndices.has(altIndex)) {
                     console.log(`   ↪️ Using alternative index: ${altIndex}`);
                     this.usedIndices.add(altIndex);
-                    return { ...this.allData[altIndex], _dataIndex: altIndex };
+                    const data = { ...this.allData[altIndex], _dataIndex: altIndex };
+                    // Make email unique
+                    if (data.email) {
+                        data.email = uniqueDataGenerator.generateUniqueEmail(workerIndex);
+                    }
+                    return data;
                 }
             }
             return null;
@@ -160,9 +167,14 @@ class TestDataManager {
         
         // Mark as used and return data
         this.usedIndices.add(dataIndex);
-        const data = this.allData[dataIndex];
+        const data = { ...this.allData[dataIndex] };
         
-        console.log(`✓ Worker ${workerIndex}: Assigned data index ${dataIndex}`);
+        // GUARANTEE EMAIL UNIQUENESS - Add timestamp and worker ID
+        if (data.email) {
+            data.email = uniqueDataGenerator.generateUniqueEmail(workerIndex);
+        }
+        
+        console.log(`✓ Worker ${workerIndex}: Assigned data index ${dataIndex} with unique email: ${data.email}`);
         
         // Return copy with metadata
         return {

@@ -52,6 +52,9 @@ class HomePage {
         this.shoppingCartLink = page.locator('a[href="/cart"]');
         this.wishListLink = page.locator('a[href="/wishlist"]');
         
+        // Authentication Elements
+        this.logoutLink = page.locator('a[href="/logout"]');
+        
         // Navigation Menu Links (Category Links)
         this.computersLink = page.getByRole('link', { name: 'Computers' });
         this.electronicsLink = page.getByRole('link', { name: 'Electronics' });
@@ -94,32 +97,27 @@ class HomePage {
     }
 
     /**
-     * Generate a random fake email address
-     * Creates email with random username (5-10 chars) and domain (5-8 chars)
-     * @returns {Promise<string>} Generated email in format: username@domain.tld
+     * Generate a random fake email address with guaranteed uniqueness
+     * Uses timestamp and random components to ensure no collisions
+     * @returns {Promise<string>} Generated email in format: user-{timestamp}-{random}@domain.tld
      * @example
      * const email = await homePage.emailFaker();
-     * // Returns: "a7b3k2@xyz123.com"
+     * // Returns: "user-1731657890123-4567@test8901.com"
      */
     async emailFaker() {
-        const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-        let username = '';
-        let domain = '';
-        let tld = '';
-
-        // Generate random username (e.g., 5-10 characters)
-        for (let i = 0; i < Math.floor(Math.random() * 6) + 5; i++) {
-            username += characters.charAt(Math.floor(Math.random() * characters.length));
-        }
-
-        // Generate random domain (e.g., 5-8 characters)
-        for (let i = 0; i < Math.floor(Math.random() * 4) + 5; i++) {
-            domain += characters.charAt(Math.floor(Math.random() * characters.length));
-        }
-
+        const timestamp = Date.now();
+        const random1 = Math.floor(Math.random() * 10000);
+        const random2 = Math.floor(Math.random() * 10000);
+        
+        // Create unique username with timestamp + random
+        const username = `user-${timestamp}-${random1}`;
+        
+        // Create unique domain
+        const domain = `test${random2}`;
+        
         // Choose a random TLD
         const tlds = ['com', 'org', 'net', 'io', 'co'];
-        tld = tlds[Math.floor(Math.random() * tlds.length)];
+        const tld = tlds[Math.floor(Math.random() * tlds.length)];
 
         return `${username}@${domain}.${tld}`;
     }
@@ -135,6 +133,33 @@ class HomePage {
     async searchProduct(productName) {
         await this.searchBox.fill(productName);
         await this.searchButton.click();
+    }
+
+    /**
+     * Check if user is logged in
+     * Verifies by checking if logout link is visible
+     * @returns {Promise<boolean>} True if user is logged in, false otherwise
+     * @example
+     * const isLoggedIn = await homePage.isUserLoggedIn();
+     */
+    async isUserLoggedIn() {
+        try {
+            return await this.logoutLink.isVisible({ timeout: 2000 });
+        } catch (error) {
+            return false;
+        }
+    }
+
+    /**
+     * Logout the current user
+     * Clicks the logout link and waits for page load
+     * @returns {Promise<void>}
+     * @example
+     * await homePage.logout();
+     */
+    async logout() {
+        await this.logoutLink.click();
+        await this.page.waitForLoadState('networkidle');
     }
 
 }

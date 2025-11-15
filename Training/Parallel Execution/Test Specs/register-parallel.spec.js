@@ -105,7 +105,7 @@ test.describe('Parallel Registration - Basic Flow', () => {
             await loginPage.login(user.email, user.password);
             
             // Verify logged in state
-            await expect(page).toHaveURL(/.*automationexercise.com/);
+            await expect(page).toHaveURL(/.*demowebshop.tricentis.com/);
             const isLoggedIn = await homePage.isUserLoggedIn();
             expect(isLoggedIn).toBe(true);
             
@@ -147,7 +147,7 @@ test.describe('Parallel Registration - Basic Flow', () => {
                 );
                 
                 await loginPage.login(user.email, user.password);
-                await expect(page).toHaveURL(/.*automationexercise.com/);
+                await expect(page).toHaveURL(/.*demowebshop.tricentis.com/);
                 
                 console.log(`${workerPrefix} ✅ User ${i + 1} registered successfully`);
             }
@@ -199,7 +199,7 @@ test.describe('Parallel Registration - Field Validation', () => {
             );
             
             await loginPage.login(user.email, user.password);
-            await expect(page).toHaveURL(/.*automationexercise.com/);
+            await expect(page).toHaveURL(/.*demowebshop.tricentis.com/);
             
             console.log(`${workerPrefix} ✅ Field validation test passed`);
         }
@@ -237,7 +237,7 @@ test.describe('Parallel Registration - Field Validation', () => {
             );
             
             await loginPage.login(user.email, user.password);
-            await expect(page).toHaveURL(/.*automationexercise.com/);
+            await expect(page).toHaveURL(/.*demowebshop.tricentis.com/);
             
             console.log(`${workerPrefix} ✅ Gender field test passed`);
         }
@@ -285,7 +285,7 @@ test.describe('Parallel Registration - Bulk Registration', () => {
                 );
                 
                 await loginPage.login(user.email, user.password);
-                await expect(page).toHaveURL(/.*automationexercise.com/);
+                await expect(page).toHaveURL(/.*demowebshop.tricentis.com/);
                 
                 // Logout for next registration
                 if (i < users.length - 1) {
@@ -340,7 +340,7 @@ test.describe('Parallel Registration - Active Users Only', () => {
             );
             
             await loginPage.login(user.email, user.password);
-            await expect(page).toHaveURL(/.*automationexercise.com/);
+            await expect(page).toHaveURL(/.*demowebshop.tricentis.com/);
             
             console.log(`${workerPrefix} ✅ Active user registered successfully`);
         }
