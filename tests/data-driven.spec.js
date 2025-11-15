@@ -86,15 +86,35 @@ test.describe('Data-Driven Tests - Iterate Through CSV', () => {
         await page.goto('/');
     });
 
-    test('Register multiple users from CSV', { tag: '@DataDrivenTest' } ,async ({ page }) => {
+    test('Register multiple users from CSV', { tag: '@DataDrivenTest' } ,async ({ page }, testInfo) => {
         // Read all data from CSV
         const allUsers = await readCSV('testdata/users.csv');
         
-        // Loop through first 2 users only (for demo)
-        for (let i = 0; i < Math.min(2, allUsers.length); i++) {
+        // IMPORTANT: When looping through users in a single test, 
+        // use a safe range to avoid conflicts with parallel tests
+        // This test processes 2 users sequentially within one test execution
+        
+        // Calculate safe starting index based on worker to avoid conflicts
+        // Each worker should process different users
+        const workerIndex = testInfo.parallelIndex || 0;
+        const startIndex = workerIndex * 10; // Give each worker 10 users' worth of space
+        const endIndex = Math.min(startIndex + 2, allUsers.length); // Process 2 users max
+        
+        console.log(`\n[Worker ${workerIndex}] Processing users from index ${startIndex} to ${endIndex - 1}`);
+        
+        // Loop through users in this worker's safe range
+        for (let i = startIndex; i < endIndex; i++) {
             const user = allUsers[i];
             
+            // Validate user exists
+            if (!user) {
+                console.log(`⚠️ No user at index ${i}, skipping...`);
+                continue;
+            }
+            
             console.log(`\n--- Registering User ${i + 1}: ${user.firstName} ${user.lastName} ---`);
+            console.log(`    Email: ${user.email}`);
+            console.log(`    Worker: ${workerIndex}`);
             
             await homePage.navigateToRegisterPage();
             await registerPage.register(

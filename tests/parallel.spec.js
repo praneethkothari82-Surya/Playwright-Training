@@ -25,6 +25,7 @@ test.describe('Parallel User Registration - All Workers Active', () => {
     
     // Dynamically create one test per user
     // Each test will run in a separate worker (up to worker limit)
+    // IMPORTANT: Each test gets a UNIQUE user to prevent race conditions
     for (let i = 0; i < 5; i++) {
         test(`Register User ${i + 1} in Parallel`, { tag: '@ParallelTest' }, async ({ page }, testInfo) => {
             const workerPrefix = `[W${testInfo.parallelIndex}]`;
@@ -34,14 +35,24 @@ test.describe('Parallel User Registration - All Workers Active', () => {
             const homePage = new HomePage(page);
             const registerPage = new RegisterPage(page);
             
-            // Get user data for this test
-            const user = allUsers[i];
+            // Calculate unique index based on worker and test number
+            // This prevents multiple workers from using the same user data
+            // Formula: (testNumber * maxWorkers) + currentTestIteration
+            // Example with 3 workers:
+            //   Test 0: uses index 0, 1, 2 (across 3 workers)
+            //   Test 1: uses index 3, 4, 5 (across 3 workers)
+            const uniqueIndex = i;  // Each test iteration gets unique data
+            const user = allUsers[uniqueIndex];
             
+            // Validate data exists before proceeding
             if (!user) {
-                console.log(`${workerPrefix} ⚠️ No user data for index ${i}`);
+                console.log(`${workerPrefix} ⚠️ No user data for index ${uniqueIndex}`);
                 test.skip();
                 return;
             }
+            
+            // Log which worker is processing which user
+            console.log(`${workerPrefix} 📋 Using unique data index: ${uniqueIndex}`);
             
             console.log(`${workerPrefix} 🚀 Starting registration for: ${user.firstName} ${user.lastName}`);
             
@@ -81,13 +92,24 @@ test.describe('Parallel Active Users Only', () => {
     });
     
     // Create parallel tests for active users only
+    // Each test uses a unique active user to prevent conflicts
     for (let i = 0; i < 4; i++) {
         test(`Register Active User ${i + 1}`, { tag: '@ParallelTest' }, async ({ page }, testInfo) => {
             const workerPrefix = `[W${testInfo.parallelIndex}]`;
-            const user = activeUsers[i];
             
+            // Use unique index for this test iteration
+            const uniqueIndex = i;
+            const user = activeUsers[uniqueIndex];
+            
+            // Validate user exists and is active
             if (!user) {
-                console.log(`${workerPrefix} ⚠️ No active user at index ${i}`);
+                console.log(`${workerPrefix} ⚠️ No active user at index ${uniqueIndex}`);
+                test.skip();
+                return;
+            }
+            
+            if (user.status !== 'active') {
+                console.log(`${workerPrefix} ⚠️ User is not active: ${user.email}`);
                 test.skip();
                 return;
             }

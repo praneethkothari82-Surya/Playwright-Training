@@ -13,12 +13,42 @@ Reference/
 ├── Workers/           # Parallel execution and worker configuration
 ├── Utilities/         # Helper functions and data readers
 ├── Jenkins/          # CI/CD pipeline configuration
+├── PARALLEL_TESTING_GUIDE.md      # Complete parallel testing guide
+├── QUICK_START_PARALLEL.md        # Quick start for thread-safe testing
 └── README.md         # This file
 ```
 
 ---
 
 ## 🗂️ Documentation Categories
+
+### 🆕 Parallel Testing & Thread Safety
+
+**Latest Addition**: Complete guides for thread-safe parallel testing
+
+| File | Description | Size |
+|------|-------------|------|
+| **PARALLEL_TESTING_GUIDE.md** | Complete beginner's guide to parallel testing | 42 KB |
+| **QUICK_START_PARALLEL.md** | 5-minute quick start guide | 6 KB |
+
+**What You'll Learn**:
+- ✅ What is parallel testing and why it matters
+- ✅ Understanding race conditions and data conflicts
+- ✅ How to partition data across workers
+- ✅ Using TestDataManager for thread-safe data access
+- ✅ Step-by-step implementation with real examples
+- ✅ Common pitfalls and best practices
+
+**Quick Start**:
+```bash
+# See the quick start guide
+cat Reference/QUICK_START_PARALLEL.md
+
+# Run thread-safe tests
+npx playwright test tests/parallel-safe.spec.js --workers=3
+```
+
+---
 
 ### 1️⃣ Workers (Parallel Execution)
 
