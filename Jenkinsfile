@@ -34,7 +34,7 @@ pipeline {
                             // Windows: Use PowerShell to get CPU count
                             def cpuCount = bat(returnStdout: true, script: '@echo off && powershell -Command "[System.Environment]::ProcessorCount"').trim()
                             def cpuCores = cpuCount.toInteger()
-                            def workers = Math.floor(cpuCores * 0.75).toInteger()
+                            def workers = (cpuCores * 0.75) as Integer
                             
                             // Set environment variable for this build
                             env.PLAYWRIGHT_WORKERS = workers.toString()
@@ -49,7 +49,7 @@ pipeline {
                             // Linux/Mac: Use nproc or sysctl
                             def cpuCount = sh(returnStdout: true, script: 'nproc || sysctl -n hw.ncpu').trim()
                             def cpuCores = cpuCount.toInteger()
-                            def workers = Math.floor(cpuCores * 0.75).toInteger()
+                            def workers = (cpuCores * 0.75) as Integer
                             
                             env.PLAYWRIGHT_WORKERS = workers.toString()
                             
